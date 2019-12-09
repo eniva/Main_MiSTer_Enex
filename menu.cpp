@@ -370,6 +370,7 @@ void substrcpy(char *d, char *s, char idx)
 
 #define HELPTEXT_DELAY 10000
 #define FRAME_DELAY 150
+#define OSD_RESPONSE 100
 
 static unsigned char getIdx(char *opt)
 {
@@ -964,6 +965,21 @@ void HandleUI(void)
 			minus = true;
 			break;
 		}
+	}
+
+	static unsigned long selectTimer = 0;
+	static unsigned long menuTimer = 0;
+
+	// Prevent double presses upon release or due to unstable wireless connections
+	if (select)
+	{
+		if (!CheckTimer(selectTimer)) select = false;
+		else selectTimer = GetTimer(OSD_RESPONSE);
+	}
+	if ((menustate != MENU_NONE2) && menu)
+	{
+		if (!CheckTimer(menuTimer)) select = false;
+		else menuTimer = GetTimer(OSD_RESPONSE);
 	}
 
 	if (menu || select || up || down || left || right)
